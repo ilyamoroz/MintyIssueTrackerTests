@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MintyIssueTrackerTests", "MintyIssueTrackerTests\MintyIssueTrackerTests.csproj", "{8646CFE2-1B37-4B57-88F7-89F680C721B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8646CFE2-1B37-4B57-88F7-89F680C721B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8646CFE2-1B37-4B57-88F7-89F680C721B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8646CFE2-1B37-4B57-88F7-89F680C721B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8646CFE2-1B37-4B57-88F7-89F680C721B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9B687081-4C62-4396-A2FF-8EAC46A8D04A}
+	EndGlobalSection
+EndGlobal
