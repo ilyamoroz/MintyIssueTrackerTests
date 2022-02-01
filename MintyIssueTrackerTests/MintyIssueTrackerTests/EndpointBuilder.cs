@@ -1,9 +1,8 @@
-﻿using MintyIssueTrackerTests.Interfaces;
-using RestSharp;
+﻿using RestSharp;
 
 namespace MintyIssueTrackerTests
 {
-    public class EndpointBuilder : IBuilder
+    public class EndpointBuilder
     {
         private const string BaseURL = "https://localhost:44333/";
         public RestClient BuildCancelJobEndpoint()
