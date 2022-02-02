@@ -54,5 +54,9 @@ namespace MintyIssueTrackerTests
         {
             return new RestClient(BaseURL + "api/user/info");
         }
+        public RestClient BuildUpdateJobEndpoint()
+        {
+            return new RestClient(BaseURL + "api/job/update");
+        }
     }
 }
