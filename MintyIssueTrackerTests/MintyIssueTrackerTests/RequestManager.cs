@@ -5,6 +5,13 @@ namespace MintyIssueTrackerTests
 {
     public class RequestManager
     {
+        private RestClient _client;
+
+        public void SetClient(RestClient client)
+        {
+            _client = client;
+        }
+
         public RestRequest CreatePostRequest()
         {
             var restRequest = new RestRequest();
@@ -12,7 +19,6 @@ namespace MintyIssueTrackerTests
             restRequest.AddHeader("Accept", "application/json");
             return restRequest;
         }
-
         public RestRequest CreatePutRequest()
         {
             var restRequest = new RestRequest();
@@ -37,9 +43,9 @@ namespace MintyIssueTrackerTests
             return restRequest;
         }
 
-        public async Task<RestResponse> GetResponse(RestClient client, RestRequest request)
+        public async Task<RestResponse> GetResponse(RestRequest request)
         {
-            return await client.ExecuteAsync(request);
+            return await _client.ExecuteAsync(request);
         }
     }
 }
