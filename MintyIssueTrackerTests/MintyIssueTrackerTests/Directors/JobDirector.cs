@@ -1,5 +1,4 @@
 ﻿using Bogus;
-using MintyIssueTrackerTests.ExtentionMethods;
 using MintyIssueTrackerTests.Model;
 using Newtonsoft.Json;
 using RestSharp;
