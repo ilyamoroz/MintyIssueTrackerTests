@@ -8,6 +8,7 @@ using RestSharp;
 using System.Net;
 using System.Threading.Tasks;
 using MintyIssueTrackerTests.Directors;
+using MintyIssueTrackerTests.Entity;
 
 namespace MintyIssueTrackerTests.Tests
 {
@@ -26,7 +27,6 @@ namespace MintyIssueTrackerTests.Tests
         {
             _bogus = new Faker();
             _endpointBuilder = new EndpointBuilder();
-            _requestManager = new RequestManager();
             _userCredentials = await AuthenticationDirector.CreateCredentials();
         }
         [SetUp]
@@ -43,7 +43,7 @@ namespace MintyIssueTrackerTests.Tests
             return data.IsValid(schema);
         }
 
-        [Test]
+        [Test, Description("Create job with correct data")]
         public async Task CreateJob_CorrectData_Success()
         {
             var jsonSchema = @"{
@@ -70,7 +70,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
-        [Test]
+        [Test, Description("Create job with past time")]
         public async Task CreateJob_InvalidTime_Failed()
         {
             var job = new JobModel()
@@ -90,7 +90,7 @@ namespace MintyIssueTrackerTests.Tests
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Get job by id")]
         public async Task GetJob_CorrectData_Success()
         {
             var jsonSchema = @"{
@@ -115,7 +115,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, JsonConvert.DeserializeObject(response.Content).ToString()));
         }
-        [Test]
+        [Test, Description("Get job by nonexistent id")]
         public async Task GetJob_NonexistentData_Failed()
         {
             var response = await RequestFactory
@@ -128,7 +128,7 @@ namespace MintyIssueTrackerTests.Tests
 
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Get job by invalid id")]
         public async Task GetJob_InvalidData_Failed()
         {
             var response = await RequestFactory
@@ -141,10 +141,10 @@ namespace MintyIssueTrackerTests.Tests
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Get list of jobs by user id")]
         public async Task GetListJobs_CorrectData_Success()
         {
-            var userId = new Repository().GetIdByUsername(_userCredentials.Username);
+            var userId = new Repository().GetIdByKey<User>("Username", _userCredentials.Username).Id;
             
             var response = await RequestFactory
                 .RequestManager
@@ -156,7 +156,7 @@ namespace MintyIssueTrackerTests.Tests
             
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Cancel job by job id")]
         public async Task CancelJob_CorrectData_Success()
         {
             var response = await RequestFactory
@@ -168,7 +168,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SendRequest(); 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Cancel job by invalid id")]
         public async Task CancelJob_InvalidData_Failed()
         {
             var response = await RequestFactory
@@ -181,7 +181,7 @@ namespace MintyIssueTrackerTests.Tests
             
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Update job information")]
         public async Task UpdateJob_CorrectData_Success()
         {
             var job = new JobModel
@@ -202,7 +202,7 @@ namespace MintyIssueTrackerTests.Tests
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Update job information by invalid id")]
         public async Task UpdateJob_InvalidId_Failed()
         {
             var job = new
@@ -224,7 +224,7 @@ namespace MintyIssueTrackerTests.Tests
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Upload images for job")]
         public async Task UploadImagesForJob_CorrectData_Success()
         {
             var jsonSchema = @"{

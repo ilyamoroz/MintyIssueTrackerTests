@@ -33,7 +33,7 @@ namespace MintyIssueTrackerTests.Tests
             return data.IsValid(schema);
         }
 
-        [Test]
+        [Test, Description("Registration user with correct data")]
         public async Task RegistrationUser_CorrectData_Success()
         {
             var jsonSchema = @"{
@@ -65,7 +65,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
 
-        [Test]
+        [Test, Description("Registration user with invalid data")]
         public async Task RegistrationUser_InvalidData_Failed()
         {
             var body = new CreateUserModel()
@@ -86,7 +86,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
-        [Test]
+        [Test, Description("Get access token with exist user")]
         public async Task GetAccessToken_CorrectData_Success()
         {
             var jsonSchema = @"{
@@ -107,7 +107,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
 
-        [Test]
+        [Test, Description("Get access token with fake user")]
         public async Task GetAccessToken_FakeData_Failed()
         {
             var fakeUser = new UserModel
@@ -126,7 +126,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
         }
 
-        [Test]
+        [Test, Description("Get access token with invalid data")]
         public async Task GetAccessToken_InvalidData_Failed()
         {
             var invalidUser = new UserModel

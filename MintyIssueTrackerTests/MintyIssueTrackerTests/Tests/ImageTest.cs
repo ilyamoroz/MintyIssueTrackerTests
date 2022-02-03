@@ -27,7 +27,7 @@ namespace MintyIssueTrackerTests.Tests
             _token = await AuthenticationDirector.GetToken(_userCredentials);
         }
 
-        [Test]
+        [Test, Description("Upload avater for user")]
         public async Task UploadAvatar_CorrectData_Success()
         {
             var response = await RequestFactory
@@ -40,7 +40,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SendRequest();
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
-        [Test]
+        [Test, Description("Upload empty image")]
         public async Task UploadAvatar_EmptyImage_Failed()
         {
             var response = await RequestFactory

@@ -1,4 +1,5 @@
 ﻿using MintyIssueTrackerTests.Directors;
+using MintyIssueTrackerTests.Entity;
 using MintyIssueTrackerTests.Model;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
@@ -36,7 +37,7 @@ namespace MintyIssueTrackerTests.Tests
             return data.IsValid(schema);
         }
 
-        [Test]
+        [Test, Description("Get information about user")]
         public async Task GetUserInfo()
         {
             var jsonSchema = @"{
@@ -61,10 +62,10 @@ namespace MintyIssueTrackerTests.Tests
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
 
-        [Test]
+        [Test, Description("Delete user by id")]
         public async Task DeleteUser_CorrectData_Success()
         {
-            var userId = new Repository().GetIdByUsername(_userCredentials.Username);
+            var userId = new Repository().GetIdByKey<User>("Username", _userCredentials.Username).Id;
 
             var response = await RequestFactory
                 .RequestManager
