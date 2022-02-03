@@ -8,11 +8,11 @@ namespace MintyIssueTrackerTests
     public class Repository
     {
         private const string _connectionString = "Server=(localdb)\\mssqllocaldb;Database=MintyIssueTrackerCore;Trusted_Connection=True;MultipleActiveResultSets=true";
-        public long GetIdByUsername(string username)
+        public T GetIdByKey<T>(string key, string value)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                return db.Query<long>($"SELECT Id FROM Users WHERE Username='{username}'").SingleOrDefault();
+                return db.Query<T>($"SELECT * FROM {typeof(T).Name}s WHERE {key}='{value}'").SingleOrDefault();
             }
         }
     }
