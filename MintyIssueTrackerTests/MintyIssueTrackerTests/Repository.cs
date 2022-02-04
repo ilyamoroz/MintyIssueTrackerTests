@@ -5,10 +5,10 @@ using Microsoft.Data.SqlClient;
 
 namespace MintyIssueTrackerTests
 {
-    public class Repository
+    public static class Repository
     {
         private const string _connectionString = "Server=(localdb)\\mssqllocaldb;Database=MintyIssueTrackerCore;Trusted_Connection=True;MultipleActiveResultSets=true";
-        public T GetIdByKey<T>(string key, string value)
+        public static T GetByKey<T>(string key, string value)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
