@@ -7,18 +7,18 @@ using NUnit.Framework;
 using RestSharp;
 using System.Net;
 using System.Threading.Tasks;
+using MintyIssueTrackerTests.Logger;
 
 namespace MintyIssueTrackerTests.Tests
 {
-    [TestFixture]
-    public class AuthenticationTest
+    public class AuthenticationTest : RequestLogger
     {
         private EndpointBuilder _endpointBuilder;
         private Faker _bogus;
-
         private static UserModel _userCredentials;
+        
 
-        [OneTimeSetUp]
+        [SetUp]
         public async Task TestSetup()
         {
             _bogus = new Faker();
@@ -36,6 +36,7 @@ namespace MintyIssueTrackerTests.Tests
         [Test, Description("Registration user with correct data")]
         public async Task RegistrationUser_CorrectData_Success()
         {
+            WriteToLog("RegisterUser correct data");
             var jsonSchema = @"{
                     'type': 'object',
                     'properties': {
@@ -48,7 +49,7 @@ namespace MintyIssueTrackerTests.Tests
             var body = new CreateUserModel()
             {
                 username = _bogus.Random.String2(minLength: 5, maxLength: 16),
-                password = _bogus.Random.String2(minLength: 5, maxLength: 16),
+                password = _bogus.Random.String2(minLength: 7, maxLength: 16),
                 firstname = _bogus.Name.FirstName(),
                 lastname = _bogus.Name.LastName()
             };
@@ -60,7 +61,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SetBody(body)
                 .AddQueryParameter("roleName", "admin")
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
@@ -68,6 +69,7 @@ namespace MintyIssueTrackerTests.Tests
         [Test, Description("Registration user with invalid data")]
         public async Task RegistrationUser_InvalidData_Failed()
         {
+            WriteToLog("Register User invalid data");
             var body = new CreateUserModel()
             {
                 username = _bogus.Random.String2(length: 3),
@@ -82,13 +84,15 @@ namespace MintyIssueTrackerTests.Tests
                 .SetBody(body)
                 .AddQueryParameter("roleName", "admin")
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Test, Description("Get access token with exist user")]
         public async Task GetAccessToken_CorrectData_Success()
         {
+            WriteToLog("Get access token correct data");
+
             var jsonSchema = @"{
                     'type': 'object',
                     'properties': {
@@ -102,7 +106,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SetApiEndpoint(_endpointBuilder.BuildTokenEndpoint())
                 .SetBody(_userCredentials)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
@@ -110,10 +114,11 @@ namespace MintyIssueTrackerTests.Tests
         [Test, Description("Get access token with fake user")]
         public async Task GetAccessToken_FakeData_Failed()
         {
+            WriteToLog("Get access token with fake user");
             var fakeUser = new UserModel
             {
-                Username = _bogus.Name.Random.String(7),
-                Password = _bogus.Name.Random.String(10),
+                Username = _bogus.Random.String2(minLength: 5, maxLength: 16),
+                Password = _bogus.Random.String2(minLength: 7, maxLength: 16)
             };
 
             var response = await RequestFactory
@@ -122,7 +127,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SetApiEndpoint(_endpointBuilder.BuildTokenEndpoint())
                 .SetBody(fakeUser)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.Conflict, response.StatusCode);
         }
 
@@ -134,14 +139,14 @@ namespace MintyIssueTrackerTests.Tests
                 Username = _bogus.Name.Random.String(3),
                 Password = _bogus.Name.Random.String(3),
             };
-
+            WriteToLog("Get access token with invalid user");
             var response = await RequestFactory
                 .RequestManager
                 .CreatePostRequest()
                 .SetApiEndpoint(_endpointBuilder.BuildTokenEndpoint())
                 .SetBody(invalidUser)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
     }

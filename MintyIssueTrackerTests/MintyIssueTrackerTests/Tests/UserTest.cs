@@ -7,11 +7,12 @@ using NUnit.Framework;
 using RestSharp;
 using System.Net;
 using System.Threading.Tasks;
+using MintyIssueTrackerTests.Logger;
 
 namespace MintyIssueTrackerTests.Tests
 {
     [TestFixture]
-    public class UserTest
+    public class UserTest : RequestLogger
     {
         private EndpointBuilder _endpointBuilder;
 
@@ -40,6 +41,7 @@ namespace MintyIssueTrackerTests.Tests
         [Test, Description("Get information about user")]
         public async Task GetUserInfo()
         {
+            WriteToLog("Get information about user");
             var jsonSchema = @"{
                     'type': 'object',
                     'properties': {
@@ -57,7 +59,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SetApiEndpoint(_endpointBuilder.BuildUserInfoEndpoint())
                 .SetToken(_token)
                 .SendRequest();
-                
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
@@ -65,7 +67,8 @@ namespace MintyIssueTrackerTests.Tests
         [Test, Description("Delete user by id")]
         public async Task DeleteUser_CorrectData_Success()
         {
-            var userId = new Repository().GetIdByKey<User>("Username", _userCredentials.Username).Id;
+            WriteToLog("Delete user by id");
+            var userId = Repository.GetByKey<User>("Username", _userCredentials.Username).Id;
 
             var response = await RequestFactory
                 .RequestManager
@@ -74,7 +77,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("id", userId)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
     }

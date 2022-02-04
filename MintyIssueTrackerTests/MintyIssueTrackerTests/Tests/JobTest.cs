@@ -9,11 +9,12 @@ using System.Net;
 using System.Threading.Tasks;
 using MintyIssueTrackerTests.Directors;
 using MintyIssueTrackerTests.Entity;
+using MintyIssueTrackerTests.Logger;
 
 namespace MintyIssueTrackerTests.Tests
 {
     [TestFixture]
-    public class JobTest
+    public class JobTest : RequestLogger
     {
         private EndpointBuilder _endpointBuilder;
         private Faker _bogus;
@@ -22,16 +23,12 @@ namespace MintyIssueTrackerTests.Tests
         private static string _token;
         private static long _jobId;
 
-        [OneTimeSetUp]
+        [SetUp]
         public async Task TestSetup()
         {
             _bogus = new Faker();
             _endpointBuilder = new EndpointBuilder();
             _userCredentials = await AuthenticationDirector.CreateCredentials();
-        }
-        [SetUp]
-        public async Task Setup()
-        {
             _token = await AuthenticationDirector.GetToken(_userCredentials);
             _jobId = await JobDirector.GetJobId(_token);
         }
@@ -46,6 +43,7 @@ namespace MintyIssueTrackerTests.Tests
         [Test, Description("Create job with correct data")]
         public async Task CreateJob_CorrectData_Success()
         {
+            WriteToLog("Create job with correct data");
             var jsonSchema = @"{
                     'type': 'object',
                     'properties': {
@@ -66,13 +64,14 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .SetBody(job)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
         [Test, Description("Create job with past time")]
         public async Task CreateJob_InvalidTime_Failed()
         {
+            WriteToLog("Create job with past time");
             var job = new JobModel()
             {
                 Name = _bogus.Name.JobTitle(),
@@ -87,12 +86,13 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .SetBody(job)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Get job by id")]
         public async Task GetJob_CorrectData_Success()
         {
+            WriteToLog("Get job by id");
             var jsonSchema = @"{
                     'type': 'object',
                     'properties': {
@@ -111,13 +111,14 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", _jobId)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, JsonConvert.DeserializeObject(response.Content).ToString()));
         }
         [Test, Description("Get job by nonexistent id")]
         public async Task GetJob_NonexistentData_Failed()
         {
+            WriteToLog("Get job by nonexistent id");
             var response = await RequestFactory
                 .RequestManager
                 .CreateGetRequest()
@@ -125,12 +126,13 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", long.MaxValue)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
         [Test, Description("Get job by invalid id")]
         public async Task GetJob_InvalidData_Failed()
         {
+            WriteToLog("Get job by invalid id");
             var response = await RequestFactory
                 .RequestManager
                 .CreateGetRequest()
@@ -138,13 +140,14 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", -1)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Get list of jobs by user id")]
         public async Task GetListJobs_CorrectData_Success()
         {
-            var userId = new Repository().GetIdByKey<User>("Username", _userCredentials.Username).Id;
+            WriteToLog("Get list of jobs by user id");
+            var userId = Repository.GetByKey<User>("Username", _userCredentials.Username).Id;
             
             var response = await RequestFactory
                 .RequestManager
@@ -153,24 +156,27 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("userId", userId)
                 .SendRequest();
-            
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
         [Test, Description("Cancel job by job id")]
         public async Task CancelJob_CorrectData_Success()
         {
+            WriteToLog("Cancel job by job id");
             var response = await RequestFactory
                 .RequestManager
                 .CreatePutRequest()
                 .SetApiEndpoint(_endpointBuilder.BuildCancelJobEndpoint())
                 .SetToken(_token)
                 .AddQueryParameter("jobId", _jobId)
-                .SendRequest(); 
+                .SendRequest();
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
         [Test, Description("Cancel job by invalid id")]
         public async Task CancelJob_InvalidData_Failed()
         {
+            WriteToLog("Cancel job by invalid id");
             var response = await RequestFactory
                 .RequestManager
                 .CreatePutRequest()
@@ -178,12 +184,13 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", -1)
                 .SendRequest();
-            
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Update job information")]
         public async Task UpdateJob_CorrectData_Success()
         {
+            WriteToLog("Update job information");
             var job = new JobModel
             {
                 Name = _bogus.Name.JobTitle(),
@@ -199,12 +206,13 @@ namespace MintyIssueTrackerTests.Tests
                 .SetBody(job)
                 .AddQueryParameter("jobId", _jobId)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
         [Test, Description("Update job information by invalid id")]
         public async Task UpdateJob_InvalidId_Failed()
         {
+            WriteToLog("Update job information by invalid id");
             var job = new
             {
                 name = _bogus.Name.JobTitle(),
@@ -220,13 +228,14 @@ namespace MintyIssueTrackerTests.Tests
                 .SetBody(job)
                 .AddQueryParameter("jobId", -1)
                 .SendRequest();
-            
 
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Upload images for job")]
         public async Task UploadImagesForJob_CorrectData_Success()
         {
+            WriteToLog("Upload images for job");
             var jsonSchema = @"{
                     'type': 'object',
                     'properties': {
@@ -245,7 +254,7 @@ namespace MintyIssueTrackerTests.Tests
                 .AddQueryParameter("height", _bogus.Random.Int(100, 2000))
                 .AddFile("httpRequest", @"C:\Users\i_moroz\Desktop\a.jpg")
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }

@@ -4,11 +4,12 @@ using NUnit.Framework;
 using RestSharp;
 using System.Net;
 using System.Threading.Tasks;
+using MintyIssueTrackerTests.Logger;
 
 namespace MintyIssueTrackerTests.Tests
 {
     [TestFixture]
-    public class ImageTest
+    public class ImageTest : RequestLogger
     {
         private EndpointBuilder _endpointBuilder;
 
@@ -30,6 +31,7 @@ namespace MintyIssueTrackerTests.Tests
         [Test, Description("Upload avater for user")]
         public async Task UploadAvatar_CorrectData_Success()
         {
+            WriteToLog("Upload avater for user");
             var response = await RequestFactory
                 .RequestManager
                 .CreatePostRequest()
@@ -38,11 +40,13 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddFile("file", @"C:\Users\i_moroz\Desktop\a.jpg")
                 .SendRequest();
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
         [Test, Description("Upload empty image")]
         public async Task UploadAvatar_EmptyImage_Failed()
         {
+            WriteToLog("Upload empty image");
             var response = await RequestFactory
                 .RequestManager
                 .CreatePostRequest()
@@ -50,7 +54,7 @@ namespace MintyIssueTrackerTests.Tests
                 .SetFormData()
                 .SetToken(_token)
                 .SendRequest();
-
+            WriteToLog(response.StatusCode.ToString());
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
     }
