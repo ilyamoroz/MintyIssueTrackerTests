@@ -28,10 +28,10 @@ namespace MintyIssueTrackerTests.Tests
             _token = await AuthenticationDirector.GetToken(_userCredentials);
         }
 
-        [Test, Description("Upload avater for user")]
+        [Test, Description("Upload avatar for user")]
         public async Task UploadAvatar_CorrectData_Success()
         {
-            WriteToLog("Upload avater for user");
+            WriteToLog("Upload avatar for user");
             var response = await RequestFactory
                 .RequestManager
                 .CreatePostRequest()
