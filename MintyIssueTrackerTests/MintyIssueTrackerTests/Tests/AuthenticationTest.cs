@@ -34,6 +34,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Registration user with correct data")]
+        [Category("Registration")]
         public async Task RegistrationUser_CorrectData_Success()
         {
             WriteToLog("RegisterUser correct data");
@@ -67,6 +68,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Registration user with invalid data")]
+        [Category("Registration")]
         public async Task RegistrationUser_InvalidData_Failed()
         {
             WriteToLog("Register User invalid data");
@@ -89,6 +91,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Get access token with exist user")]
+        [Category("Access token")]
         public async Task GetAccessToken_CorrectData_Success()
         {
             WriteToLog("Get access token correct data");
@@ -112,6 +115,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Get access token with fake user")]
+        [Category("Access token")]
         public async Task GetAccessToken_FakeData_Failed()
         {
             WriteToLog("Get access token with fake user");
@@ -132,6 +136,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Get access token with invalid data")]
+        [Category("Access token")]
         public async Task GetAccessToken_InvalidData_Failed()
         {
             var invalidUser = new UserModel

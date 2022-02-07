@@ -41,6 +41,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Create job with correct data")]
+        [Category("Create job")]
         public async Task CreateJob_CorrectData_Success()
         {
             WriteToLog("Create job with correct data");
@@ -69,6 +70,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
         }
         [Test, Description("Create job with past time")]
+        [Category("Create job")]
         public async Task CreateJob_InvalidTime_Failed()
         {
             WriteToLog("Create job with past time");
@@ -90,6 +92,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Get job by id")]
+        [Category("Get job")]
         public async Task GetJob_CorrectData_Success()
         {
             WriteToLog("Get job by id");
@@ -116,6 +119,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.IsTrue(IsValidJSONSchema(jsonSchema, JsonConvert.DeserializeObject(response.Content).ToString()));
         }
         [Test, Description("Get job by nonexistent id")]
+        [Category("Get job")]
         public async Task GetJob_NonexistentData_Failed()
         {
             WriteToLog("Get job by nonexistent id");
@@ -130,6 +134,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
         [Test, Description("Get job by invalid id")]
+        [Category("Get job")]
         public async Task GetJob_InvalidData_Failed()
         {
             WriteToLog("Get job by invalid id");
@@ -144,6 +149,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Get list of jobs by user id")]
+        [Category("Get job")]
         public async Task GetListJobs_CorrectData_Success()
         {
             WriteToLog("Get list of jobs by user id");
@@ -160,6 +166,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
         [Test, Description("Cancel job by job id")]
+        [Category("Cancel job")]
         public async Task CancelJob_CorrectData_Success()
         {
             WriteToLog("Cancel job by job id");
@@ -174,6 +181,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
         [Test, Description("Cancel job by invalid id")]
+        [Category("Cancel job")]
         public async Task CancelJob_InvalidData_Failed()
         {
             WriteToLog("Cancel job by invalid id");
@@ -188,6 +196,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Update job information")]
+        [Category("Update job")]
         public async Task UpdateJob_CorrectData_Success()
         {
             WriteToLog("Update job information");
@@ -210,6 +219,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
         [Test, Description("Update job information by invalid id")]
+        [Category("Update job")]
         public async Task UpdateJob_InvalidId_Failed()
         {
             WriteToLog("Update job information by invalid id");
@@ -233,6 +243,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
         [Test, Description("Upload images for job")]
+        [Category("Upload image")]
         public async Task UploadImagesForJob_CorrectData_Success()
         {
             WriteToLog("Upload images for job");

@@ -29,6 +29,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Upload avatar for user")]
+        [Category("Upload avatar")]
         public async Task UploadAvatar_CorrectData_Success()
         {
             WriteToLog("Upload avatar for user");
@@ -44,6 +45,7 @@ namespace MintyIssueTrackerTests.Tests
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
         }
         [Test, Description("Upload empty image")]
+        [Category("Upload avatar")]
         public async Task UploadAvatar_EmptyImage_Failed()
         {
             WriteToLog("Upload empty image");

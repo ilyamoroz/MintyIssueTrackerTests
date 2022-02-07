@@ -39,6 +39,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Get information about user")]
+        [Category("User")]
         public async Task GetUserInfo()
         {
             WriteToLog("Get information about user");
@@ -65,6 +66,7 @@ namespace MintyIssueTrackerTests.Tests
         }
 
         [Test, Description("Delete user by id")]
+        [Category("User")]
         public async Task DeleteUser_CorrectData_Success()
         {
             WriteToLog("Delete user by id");
