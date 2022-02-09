@@ -1,9 +1,10 @@
-﻿using Serilog;
+﻿using System;
+using Serilog;
 using Serilog.Events;
 
 namespace MintyIssueTrackerTests.Logger
 {
-    public class LoggerConfig
+    public static class LoggerConfig
     {
         private static ILogger _logger { get; set; }
         public static ILogger Configure()
@@ -12,7 +13,7 @@ namespace MintyIssueTrackerTests.Logger
             {
                 _logger = new LoggerConfiguration()
                     .WriteTo.File(
-                        path: @"C:\\Logs\\MintyIssueTrackerTests\\MintyIssueTrackerTests.log",
+                        path: $"{Environment.CurrentDirectory}\\log.log",
                         restrictedToMinimumLevel: LogEventLevel.Information,
                         shared: true)
                     .WriteTo.NUnitOutput()
