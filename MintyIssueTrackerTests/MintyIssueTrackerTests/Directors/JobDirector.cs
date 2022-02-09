@@ -1,4 +1,6 @@
-﻿using Bogus;
+﻿using System;
+using System.Net;
+using Bogus;
 using MintyIssueTrackerTests.Model;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
@@ -12,13 +14,16 @@ namespace MintyIssueTrackerTests.Directors
         private static RequestLogger _logger = new RequestLogger();
         private static EndpointBuilder _endpointBuilder = new EndpointBuilder();
 
+        /// <summary>
+        /// Returns job id for test
+        /// </summary>
         public static async Task<long> GetJobId(string token)
         {
             _logger.WriteToLog("Create job for test");
             var job = new JobModel
             {
-                Name = _bogus.Name.JobTitle(),
-                Description = _bogus.Name.JobDescriptor(),
+                Name = _bogus.Random.String2(minLength: 6, maxLength: 64),
+                Description = _bogus.Random.String2(minLength: 6, maxLength: 256),
                 TimeSchedule = _bogus.Date.Future()
             };
 
@@ -29,8 +34,15 @@ namespace MintyIssueTrackerTests.Directors
                 .SetToken(token)
                 .SetBody(job)
                 .SendRequest();
-            return JsonConvert.DeserializeObject<CreateJobResponseModel>(response.Content).jobId;
 
+            if (response.StatusCode == HttpStatusCode.Created)
+            {
+                return JsonConvert.DeserializeObject<CreateJobResponseModel>(response.Content).jobId;
+            }
+            else
+            {
+                throw new ArgumentNullException($"Job. Response content {response.Content}, response code {response.StatusCode}");
+            }
         }
     }
 }
