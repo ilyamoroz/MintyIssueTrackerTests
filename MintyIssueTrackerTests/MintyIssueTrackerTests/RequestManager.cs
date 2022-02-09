@@ -3,15 +3,14 @@ using System.Threading.Tasks;
 
 namespace MintyIssueTrackerTests
 {
+    /// <summary>
+    /// Request manager
+    /// </summary>
     public class RequestManager
     {
-        private RestClient _client;
-
-        public void SetClient(RestClient client)
-        {
-            _client = client;
-        }
-
+        /// <summary>
+        /// Create request with post method
+        /// </summary>
         public RestRequest CreatePostRequest()
         {
             var restRequest = new RestRequest();
@@ -19,6 +18,10 @@ namespace MintyIssueTrackerTests
             restRequest.AddHeader("Accept", "application/json");
             return restRequest;
         }
+
+        /// <summary>
+        /// Create request with put method
+        /// </summary>
         public RestRequest CreatePutRequest()
         {
             var restRequest = new RestRequest();
@@ -27,6 +30,9 @@ namespace MintyIssueTrackerTests
             return restRequest;
         }
 
+        /// <summary>
+        /// Create request with get method
+        /// </summary>
         public RestRequest CreateGetRequest()
         {
             var restRequest = new RestRequest();
@@ -35,6 +41,9 @@ namespace MintyIssueTrackerTests
             return restRequest;
         }
 
+        /// <summary>
+        /// Create request with delete method
+        /// </summary>
         public RestRequest CreateDeleteRequest()
         {
             var restRequest = new RestRequest();
@@ -43,9 +52,12 @@ namespace MintyIssueTrackerTests
             return restRequest;
         }
 
-        public async Task<RestResponse> GetResponse(RestRequest request)
+        /// <summary>
+        /// Execute request
+        /// </summary>
+        public async Task<RestResponse> GetResponse(RestClient client, RestRequest request)
         {
-            return await _client.ExecuteAsync(request);
+            return await client.ExecuteAsync(request);
         }
     }
 }
