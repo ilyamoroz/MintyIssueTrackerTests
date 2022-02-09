@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "Name": { "type": "string" },
+    "Description": { "type": "string" },
+    "TimeSchedule": { "type": "string" },
+    "UserId": { "type": "number" },
+    "StatusId": { "type": "number" }
+  }
+}

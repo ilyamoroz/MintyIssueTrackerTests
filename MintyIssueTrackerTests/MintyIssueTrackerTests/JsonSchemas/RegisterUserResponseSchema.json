@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "username": { "type": "string" },
+    "firstname": { "type": "string" },
+    "lastname": { "type": "string" }
+  }
+}
