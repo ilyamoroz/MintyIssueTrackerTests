@@ -1,8 +1,6 @@
 ﻿using Bogus;
 using MintyIssueTrackerTests.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using NUnit.Framework;
 using RestSharp;
 using System.Net;
@@ -10,6 +8,7 @@ using System.Threading.Tasks;
 using MintyIssueTrackerTests.Directors;
 using MintyIssueTrackerTests.Entity;
 using MintyIssueTrackerTests.Logger;
+using System;
 
 namespace MintyIssueTrackerTests.Tests
 {
@@ -20,8 +19,8 @@ namespace MintyIssueTrackerTests.Tests
         private Faker _bogus;
 
         private static UserModel _userCredentials;
-        private static string _token;
-        private static long _jobId;
+        private string _token;
+        private long _jobId;
 
         [SetUp]
         public async Task TestSetup()
@@ -33,24 +32,12 @@ namespace MintyIssueTrackerTests.Tests
             _jobId = await JobDirector.GetJobId(_token);
         }
 
-        private bool IsValidJSONSchema(string jsonSchema, string json)
-        {
-            JsonSchema schema = JsonSchema.Parse(jsonSchema);
-            var data = JObject.Parse(json);
-            return data.IsValid(schema);
-        }
 
         [Test, Description("Create job with correct data")]
         [Category("Create job")]
         public async Task CreateJob_CorrectData_Success()
         {
             WriteToLog("Create job with correct data");
-            var jsonSchema = @"{
-                    'type': 'object',
-                    'properties': {
-                        'jobId': {'type': 'number'}
-                      }
-                 }";
             var job = new JobModel
             {
                 Name = _bogus.Name.JobTitle(),
@@ -65,10 +52,18 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .SetBody(job)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-            Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
+
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+                Assert.IsTrue(JSONHelper.IsValidJSONSchema(JSONHelper.CreateJobResponseSchemaPath, response.Content));
+            });
+            
         }
+
+
         [Test, Description("Create job with past time")]
         [Category("Create job")]
         public async Task CreateJob_InvalidTime_Failed()
@@ -88,24 +83,17 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .SetBody(job)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
+
+
         [Test, Description("Get job by id")]
         [Category("Get job")]
         public async Task GetJob_CorrectData_Success()
         {
             WriteToLog("Get job by id");
-            var jsonSchema = @"{
-                    'type': 'object',
-                    'properties': {
-                        'Name': {'type': 'string'},
-                        'Description': {'type': 'string'},
-                        'TimeSchedule': {'type': 'string'},
-                        'UserId': {'type': 'number'},
-                        'StatusId': {'type': 'number'}
-                      }
-                 }";
+            
 
             var response = await RequestFactory
                 .RequestManager
@@ -114,10 +102,15 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", _jobId)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.IsTrue(IsValidJSONSchema(jsonSchema, JsonConvert.DeserializeObject(response.Content).ToString()));
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                Assert.IsTrue(JSONHelper.IsValidJSONSchema(JSONHelper.GetJobResponseSchemaPath, JsonConvert.DeserializeObject(response.Content).ToString()));
+            });
         }
+
+
         [Test, Description("Get job by nonexistent id")]
         [Category("Get job")]
         public async Task GetJob_NonexistentData_Failed()
@@ -130,9 +123,11 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", long.MaxValue)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
+        
+        
         [Test, Description("Get job by invalid id")]
         [Category("Get job")]
         public async Task GetJob_InvalidData_Failed()
@@ -145,9 +140,11 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", -1)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
+        
+        
         [Test, Description("Get list of jobs by user id")]
         [Category("Get job")]
         public async Task GetListJobs_CorrectData_Success()
@@ -162,9 +159,11 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("userId", userId)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
+        
+        
         [Test, Description("Cancel job by job id")]
         [Category("Cancel job")]
         public async Task CancelJob_CorrectData_Success()
@@ -177,9 +176,11 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", _jobId)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
+        
+        
         [Test, Description("Cancel job by invalid id")]
         [Category("Cancel job")]
         public async Task CancelJob_InvalidData_Failed()
@@ -192,9 +193,11 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("jobId", -1)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
+        
+        
         [Test, Description("Update job information")]
         [Category("Update job")]
         public async Task UpdateJob_CorrectData_Success()
@@ -215,9 +218,11 @@ namespace MintyIssueTrackerTests.Tests
                 .SetBody(job)
                 .AddQueryParameter("jobId", _jobId)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
+        
+        
         [Test, Description("Update job information by invalid id")]
         [Category("Update job")]
         public async Task UpdateJob_InvalidId_Failed()
@@ -239,20 +244,16 @@ namespace MintyIssueTrackerTests.Tests
                 .AddQueryParameter("jobId", -1)
                 .SendRequest();
 
-            WriteToLog(response.StatusCode.ToString());
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
         }
+        
+        
         [Test, Description("Upload images for job")]
         [Category("Upload image")]
         public async Task UploadImagesForJob_CorrectData_Success()
         {
             WriteToLog("Upload images for job");
-            var jsonSchema = @"{
-                    'type': 'object',
-                    'properties': {
-                        'Image': {'type': 'string'}
-                      }
-                 }";
 
             var response = await RequestFactory
                 .RequestManager
@@ -263,11 +264,14 @@ namespace MintyIssueTrackerTests.Tests
                 .AddQueryParameter("jobId", _jobId)
                 .AddQueryParameter("width", _bogus.Random.Int(100, 2000))
                 .AddQueryParameter("height", _bogus.Random.Int(100, 2000))
-                .AddFile("httpRequest", @"C:\Users\i_moroz\Desktop\a.jpg")
+                .AddFile("httpRequest", $"{Environment.CurrentDirectory}\\Images\\a.jpg")
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                Assert.IsTrue(JSONHelper.IsValidJSONSchema(JSONHelper.UploadImageResponseSchemaPath, response.Content));
+            });
         }
     }
 }

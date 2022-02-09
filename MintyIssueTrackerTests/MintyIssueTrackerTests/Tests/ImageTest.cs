@@ -5,6 +5,7 @@ using RestSharp;
 using System.Net;
 using System.Threading.Tasks;
 using MintyIssueTrackerTests.Logger;
+using System;
 
 namespace MintyIssueTrackerTests.Tests
 {
@@ -14,16 +15,12 @@ namespace MintyIssueTrackerTests.Tests
         private EndpointBuilder _endpointBuilder;
 
         private static UserModel _userCredentials;
-        private static string _token;
+        private string _token;
 
-        [OneTimeSetUp]
-        public void TestSetup()
-        {
-            _endpointBuilder = new EndpointBuilder();
-        }
         [SetUp]
         public async Task Setup()
         {
+            _endpointBuilder = new EndpointBuilder();
             _userCredentials = await AuthenticationDirector.CreateCredentials();
             _token = await AuthenticationDirector.GetToken(_userCredentials);
         }
@@ -39,10 +36,12 @@ namespace MintyIssueTrackerTests.Tests
                 .SetApiEndpoint(_endpointBuilder.BuildUploadAvatarEndpoint())
                 .SetFormData()
                 .SetToken(_token)
-                .AddFile("file", @"C:\Users\i_moroz\Desktop\a.jpg")
+                .AddFile("file", $"{Environment.CurrentDirectory}\\Images\\a.jpg")
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
+
+            
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode, response.Content);
         }
         [Test, Description("Upload empty image")]
         [Category("Upload avatar")]
@@ -56,8 +55,8 @@ namespace MintyIssueTrackerTests.Tests
                 .SetFormData()
                 .SetToken(_token)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode, response.Content);
         }
     }
 }

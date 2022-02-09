@@ -1,8 +1,6 @@
 ﻿using MintyIssueTrackerTests.Directors;
 using MintyIssueTrackerTests.Entity;
 using MintyIssueTrackerTests.Model;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using NUnit.Framework;
 using RestSharp;
 using System.Net;
@@ -17,42 +15,23 @@ namespace MintyIssueTrackerTests.Tests
         private EndpointBuilder _endpointBuilder;
 
         private static UserModel _userCredentials;
-        private static string _token;
+        private string _token;
         
-        [OneTimeSetUp]
-        public void TestSetup()
-        {
-            _endpointBuilder = new EndpointBuilder();
-        }
         [SetUp]
         public async Task Setup()
         {
+            _endpointBuilder = new EndpointBuilder();
             _userCredentials = await AuthenticationDirector.CreateCredentials();
             _token = await AuthenticationDirector.GetToken(_userCredentials);
         }
-
-        private bool IsValidJSONSchema(string jsonSchema, string json)
-        {
-            JsonSchema schema = JsonSchema.Parse(jsonSchema);
-            var data = JObject.Parse(json);
-            return data.IsValid(schema);
-        }
+        
 
         [Test, Description("Get information about user")]
         [Category("User")]
         public async Task GetUserInfo()
         {
             WriteToLog("Get information about user");
-            var jsonSchema = @"{
-                    'type': 'object',
-                    'properties': {
-                        'username': {'type': 'string'},
-                        'password': {'type': 'string'},
-                        'firstname': {'type': 'string'},
-                        'lastname': {'type': 'string'},
-                         'role': {'type': 'string'}
-                      }
-                 }";
+           
 
             var response = await RequestFactory
                 .RequestManager
@@ -60,10 +39,14 @@ namespace MintyIssueTrackerTests.Tests
                 .SetApiEndpoint(_endpointBuilder.BuildUserInfoEndpoint())
                 .SetToken(_token)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.IsTrue(IsValidJSONSchema(jsonSchema, response.Content));
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content);
+                Assert.IsTrue(JSONHelper.IsValidJSONSchema(JSONHelper.GetUserResponseSchemaPath, response.Content));
+            });
         }
+
 
         [Test, Description("Delete user by id")]
         [Category("User")]
@@ -79,8 +62,8 @@ namespace MintyIssueTrackerTests.Tests
                 .SetToken(_token)
                 .AddQueryParameter("id", userId)
                 .SendRequest();
-            WriteToLog(response.StatusCode.ToString());
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            WriteToLog("Response status code: " + response.StatusCode.ToString() + " Response body: " + response.Content);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content);
         }
     }
 }
